@@ -1,0 +1,19 @@
+{
+  "app_name": "Nutri-Zenze",
+  "app_tagline": "Espejo Inteligente Médico",
+  "version": "0.1.0",
+  "welcome": {
+    "greeting": "¡Hola, {name}!",
+    "last_scan": "Último análisis: hace {days} días",
+    "cta": "INICIAR ANÁLISIS"
+  },
+  "scanning": {
+    "posture_correct": "Postura: CORRECTA ✓",
+    "lighting_optimal": "Iluminación: ÓPTIMA ✓"
+  },
+  "results": {
+    "body_fat": "Grasa corporal: {percent}%",
+    "muscle_mass": "Masa muscular: {kg}kg",
+    "risk_title": "RIESGO CARDIOVASCULAR"
+  }
+}
