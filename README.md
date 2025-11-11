@@ -90,8 +90,8 @@ Luego abre: [**http://localhost:5000**](http://localhost:5000)
 
 ## 📞 Contacto
 
-- **Email**: info@nutrizenze.com
-- **WhatsApp**: +57 (302) XXX-XXXX
+- **Email**: cpenpen90@gmail.com
+- **WhatsApp**: +57 3045965261
 - **Ubicación**: Chapinero, Bogotá, Colombia
 
 ---
