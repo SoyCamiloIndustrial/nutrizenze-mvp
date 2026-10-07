@@ -4,6 +4,11 @@ from datetime import datetime
 import json
 import re
 
+try:
+    from app.models.longitudinal import compare_reports
+except ImportError:  # ejecutado como `python app/main.py`
+    from models.longitudinal import compare_reports
+
 app = Flask(__name__)
 
 # Cargar strings
@@ -104,7 +109,8 @@ def home():
             "GET /",
             "GET /api/health",
             "POST /api/analyze-labs",
-            "POST /api/get-recommendations"
+            "POST /api/get-recommendations",
+            "POST /api/compare-labs"
         ]
     })
 
@@ -141,6 +147,19 @@ def get_recommendations():
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/compare-labs', methods=['POST'])
+def compare_labs():
+    """Compara dos reportes de laboratorio y genera alertas para el profesional."""
+    data = request.get_json(silent=True) or {}
+    previous, current = data.get('previous'), data.get('current')
+    if not previous or not current:
+        return jsonify({"status": "error", "message": "Se requieren 'previous' y 'current'"}), 400
+    try:
+        result = compare_reports(previous, current)
+    except (KeyError, ValueError, TypeError) as e:
+        return jsonify({"status": "error", "message": f"Reporte inválido: {e}"}), 400
+    return jsonify({"status": "success", **result})
 
 if __name__ == '__main__':
     print("\n" + "="*50)
