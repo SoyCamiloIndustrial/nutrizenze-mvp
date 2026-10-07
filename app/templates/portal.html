@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Bienvenido a Vital Trace</h1>
+<p class="sub">Convierte datos en decisiones de salud que puedes sostener.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+  <div class="card">
+    <h2>Soy profesional de salud</h2>
+    <p>Historial completo de exámenes, comparación entre tomas y alertas para revisar. Aprueba las recomendaciones que verá el paciente.</p>
+    <a class="btn" href="{{ url_for('views.doctor_home') }}">Entrar como médico</a>
+  </div>
+  <div class="card">
+    <h2>Soy paciente</h2>
+    <p>Resumen de tus últimos resultados y las recomendaciones que tu equipo de salud aprobó para ti.</p>
+    <a class="btn verde" href="{{ url_for('views.patient_home') }}">Entrar como paciente</a>
+  </div>
+</div>
+<p class="aviso">Versión de demostración con datos ficticios y sin inicio de sesión.</p>
+{% endblock %}

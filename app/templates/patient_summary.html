@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Mi resumen · Vital Trace{% endblock %}
+{% block rol %}<span class="rol">Paciente</span>{% endblock %}
+{% block content %}
+<h1>Hola, {{ patient.name }}</h1>
+{% if latest %}
+<p class="sub">Resumen de tu último examen ({{ latest.date }}).</p>
+<div class="card">
+  <h2>Tus resultados</h2>
+  <table>
+    {% for i in items %}
+    <tr>
+      <td>{{ i.label }}</td>
+      <td class="num">{{ i.value }} mg/dL</td>
+      <td><span class="chip {{ i.level }}">{{ i.level_text }}</span></td>
+      <td class="aviso">{% if i.trend == "sube" %}↑ subió{% elif i.trend == "baja" %}↓ bajó{% elif i.trend == "igual" %}= igual{% endif %}{% if i.trend %} frente al examen anterior{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% if items|selectattr("level", "ne", "ok")|list %}
+  <p>Algunos valores están fuera del rango de referencia. Tu médico ya puede verlos y te orientará en tu próxima consulta.</p>
+  {% else %}
+  <p>Todos tus valores están en el rango de referencia.</p>
+  {% endif %}
+</div>
+{% else %}
+<p class="sub">Aún no tienes exámenes registrados.</p>
+{% endif %}
+<div class="card">
+  <h2>Tus recomendaciones</h2>
+  {% for r in recommendations %}
+  <div class="alerta" style="border-color:var(--verde)">{{ r.text }}<br><span class="aviso">{{ r.author }}</span></div>
+  {% else %}
+  <p>Tu equipo de salud aún no ha publicado recomendaciones.</p>
+  {% endfor %}
+</div>
+<p class="aviso">Esta información no reemplaza la consulta médica. Ante cualquier duda, habla con tu médico.</p>
+{% endblock %}

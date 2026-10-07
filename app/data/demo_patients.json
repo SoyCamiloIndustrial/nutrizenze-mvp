@@ -1,0 +1,39 @@
+{
+  "_nota": "Datos sintéticos de demostración. No corresponden a personas reales.",
+  "patients": [
+    {
+      "id": "demo-001",
+      "name": "Paciente Demo Uno",
+      "age": 36,
+      "sex": "M",
+      "reports": [
+        {"date": "2026-03-12", "lab": "Laboratorio A", "fasting": true,
+         "values": {"total_cholesterol": 190.0, "hdl": 33.0, "triglycerides": 310.0, "glucose": 97.0}},
+        {"date": "2026-08-20", "lab": "Laboratorio A", "fasting": null,
+         "values": {"total_cholesterol": 181.0, "hdl": 28.0, "triglycerides": 372.0}},
+        {"date": "2026-09-18", "lab": "Laboratorio B", "fasting": true,
+         "values": {"total_cholesterol": 155.0, "hdl": 45.0, "ldl": 52.0, "triglycerides": 290.0, "glucose": 102.0}}
+      ],
+      "recommendations": [
+        {"id": "r1", "text": "Seguir el plan de alimentación de la nutricionista: menos harinas refinadas y azúcares.", "author": "Nutricionista", "status": "aprobada"},
+        {"id": "r2", "text": "Actividad física de 45 a 60 minutos, 4 a 5 veces por semana.", "author": "Médico ocupacional", "status": "aprobada"},
+        {"id": "r3", "text": "Repetir perfil lipídico en ayunas de 12 horas en el mismo laboratorio.", "author": "Sugerencia de Vital Trace", "status": "pendiente"}
+      ]
+    },
+    {
+      "id": "demo-002",
+      "name": "Paciente Demo Dos",
+      "age": 52,
+      "sex": "F",
+      "reports": [
+        {"date": "2026-02-02", "lab": "Laboratorio C", "fasting": true,
+         "values": {"total_cholesterol": 228.0, "hdl": 51.0, "ldl": 150.0, "triglycerides": 135.0, "glucose": 108.0}},
+        {"date": "2026-07-15", "lab": "Laboratorio C", "fasting": true,
+         "values": {"total_cholesterol": 214.0, "hdl": 53.0, "ldl": 138.0, "triglycerides": 115.0, "glucose": 104.0}}
+      ],
+      "recommendations": [
+        {"id": "r1", "text": "Control de glucosa en ayunas en 3 meses.", "author": "Médico general", "status": "aprobada"}
+      ]
+    }
+  ]
+}

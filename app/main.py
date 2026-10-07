@@ -6,10 +6,13 @@ import re
 
 try:
     from app.models.longitudinal import compare_reports
+    from app.views import views
 except ImportError:  # ejecutado como `python app/main.py`
     from models.longitudinal import compare_reports
+    from views import views
 
 app = Flask(__name__)
+app.register_blueprint(views)
 
 # Cargar strings
 try:
@@ -96,7 +99,7 @@ ocr = LabResultsOCR()
 engine = RecommendationEngine()
 
 # ===== ENDPOINTS =====
-@app.route('/')
+@app.route('/api')
 def home():
     return jsonify({
         "status": "online",
@@ -106,7 +109,8 @@ def home():
         "language": "es_CO",
         "vision": "Transformando vidas, un latido a la vez 💚",
         "endpoints": [
-            "GET /",
+            "GET / (portal web)",
+            "GET /api",
             "GET /api/health",
             "POST /api/analyze-labs",
             "POST /api/get-recommendations",
