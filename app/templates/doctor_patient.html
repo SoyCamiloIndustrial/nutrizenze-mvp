@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.name }} · Vital Trace{% endblock %}
+{% block rol %}<span class="rol">Profesional de salud</span>{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('views.doctor_home') }}">← Pacientes</a></p>
+<h1>{{ patient.name }}</h1>
+<p class="sub">{{ patient.age }} años · {{ "Masculino" if patient.sex == "M" else "Femenino" }} · {{ patient.reports|length }} exámenes · <a href="{{ url_for('views.patient_summary', patient_id=patient.id) }}">Ver lo que ve el paciente</a></p>
+
+<div class="card">
+  <h2>Alertas para revisión</h2>
+  {% for a in alerts %}
+  <div class="alerta {{ a.severity }}">
+    <span class="chip {{ a.severity }}">{{ a.severity|capitalize }}</span>
+    <strong>{{ a.period }}</strong><br>{{ a.message }}
+  </div>
+  {% else %}
+  <p>Sin alertas.</p>
+  {% endfor %}
+  <p class="aviso">Alertas para revisión del profesional de salud. Vital Trace no emite diagnósticos ni indicaciones de tratamiento.</p>
+</div>
+
+<div class="card scroll">
+  <h2>Historial de exámenes (mg/dL)</h2>
+  <table>
+    <tr><th>Analito</th>{% for r in patient.reports %}<th class="num">{{ r.date }}<br><span style="text-transform:none">{{ r.lab }}{% if r.fasting is none %} · ayuno ?{% endif %}</span></th>{% endfor %}</tr>
+    {% for a in analytes %}
+    <tr><td>{{ labels[a] }}</td>{% for r in patient.reports %}<td class="num">{{ r["values"][a] if a in r["values"] else "—" }}</td>{% endfor %}</tr>
+    {% endfor %}
+  </table>
+</div>
+
+{% for c in comparisons %}
+<div class="card scroll">
+  <h2>Cambio {{ c.previous.date }} → {{ c.current.date }} ({{ c.period_days }} días)</h2>
+  <table>
+    <tr><th>Analito</th><th class="num">Antes</th><th class="num">Después</th><th class="num">Cambio</th><th class="num">Variación esperada</th><th></th></tr>
+    {% for ch in c.changes %}
+    <tr>
+      <td>{{ ch.label }}</td><td class="num">{{ ch.before }}</td><td class="num">{{ ch.after }}</td>
+      <td class="num">{{ "%+.1f"|format(ch.change_pct) }}%</td><td class="num">±{{ ch.rcv_pct }}%</td>
+      <td>{% if ch.exceeds_rcv %}<span class="chip alta">Supera lo esperado</span>{% else %}<span class="chip ok">Dentro de lo esperado</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endfor %}
+
+<div class="card" id="recomendaciones">
+  <h2>Recomendaciones</h2>
+  <p class="aviso">Solo las recomendaciones aprobadas son visibles para el paciente.</p>
+  <table>
+    <tr><th>Recomendación</th><th>Autor</th><th>Estado</th><th></th></tr>
+    {% for r in patient.recommendations %}
+    <tr>
+      <td>{{ r.text }}</td><td>{{ r.author }}</td>
+      <td><span class="chip {{ {'aprobada':'ok','pendiente':'media','descartada':'info'}[r.status] }}">{{ r.status|capitalize }}</span></td>
+      <td>{% if r.status == "pendiente" %}
+        <form method="post" action="{{ url_for('views.doctor_review_recommendation', patient_id=patient.id, rec_id=r.id) }}" class="fila">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn verde peq" name="action" value="aprobar">Aprobar</button>
+          <button class="btn linea peq" name="action" value="descartar">Descartar</button>
+        </form>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <form method="post" action="{{ url_for('views.doctor_add_recommendation', patient_id=patient.id) }}" style="margin-top:16px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="text"><strong>Nueva recomendación para el paciente</strong></label>
+    <textarea id="text" name="text" rows="2" required></textarea>
+    <div class="fila" style="margin-top:8px">
+      <input type="text" name="author" placeholder="Firma (ej. Dra. Pérez)" style="max-width:280px">
+      <button class="btn">Agregar y aprobar</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

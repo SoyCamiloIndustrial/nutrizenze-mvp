@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Pacientes · Vital Trace{% endblock %}
+{% block rol %}<span class="rol">Profesional de salud</span>{% endblock %}
+{% block content %}
+<h1>Pacientes</h1>
+<p class="sub">Las alertas señalan cambios o datos que conviene revisar. No son diagnósticos.</p>
+<div class="card scroll">
+  <table>
+    <tr><th>Paciente</th><th>Edad</th><th class="num">Exámenes</th><th>Último examen</th><th>Alertas</th><th>Por aprobar</th><th></th></tr>
+    {% for r in rows %}
+    <tr>
+      <td>{{ r.patient.name }}</td>
+      <td>{{ r.patient.age }}</td>
+      <td class="num">{{ r.n_reports }}</td>
+      <td>{{ r.last_date or "—" }}</td>
+      <td>{% if r.n_alerts %}<span class="chip alta">{{ r.n_alerts }} para revisar</span>{% else %}<span class="chip ok">Sin alertas</span>{% endif %}</td>
+      <td>{% if r.n_pending %}<span class="chip media">{{ r.n_pending }}</span>{% else %}—{% endif %}</td>
+      <td><a class="btn peq" href="{{ url_for('views.doctor_patient', patient_id=r.patient.id) }}">Ver historial</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
