@@ -5,16 +5,18 @@
   de recomendaciones (solo las aprobadas llegan al paciente).
 - Paciente: resumen del último examen y recomendaciones aprobadas.
 
-MVP sin autenticación: cualquiera puede abrir ambas entradas.
+Requiere sesión: el médico ve todos los pacientes; cada paciente solo el suyo.
 """
-from flask import Blueprint, abort, redirect, render_template, request, url_for
+from flask import Blueprint, abort, g, redirect, render_template, request, url_for
 
 try:
     from app.models.longitudinal import ANALYTES, compare_reports
     from app.models.patient_store import PatientStore
+    from app.security import audit, role_required
 except ImportError:  # ejecutado como `python app/main.py`
     from models.longitudinal import ANALYTES, compare_reports
     from models.patient_store import PatientStore
+    from security import audit, role_required
 
 views = Blueprint("views", __name__)
 store = PatientStore()
@@ -81,6 +83,7 @@ def portal():
 
 # ===== MÉDICO =====
 @views.route("/medico")
+@role_required("medico")
 def doctor_home():
     rows = []
     for p in store.all():
@@ -96,8 +99,10 @@ def doctor_home():
 
 
 @views.route("/medico/paciente/<patient_id>")
+@role_required("medico")
 def doctor_patient(patient_id):
     patient = _patient_or_404(patient_id)
+    audit("ver_historial", paciente=patient_id)
     analytes = [a for a in ANALYTES if any(a in r["values"] for r in patient["reports"])]
     comparisons = patient_comparisons(patient)
     return render_template(
@@ -111,32 +116,45 @@ def doctor_patient(patient_id):
 
 
 @views.route("/medico/paciente/<patient_id>/recomendaciones", methods=["POST"])
+@role_required("medico")
 def doctor_add_recommendation(patient_id):
     _patient_or_404(patient_id)
     text = request.form.get("text", "").strip()
     if text:
-        store.add_recommendation(patient_id, text, request.form.get("author", "").strip() or "Médico tratante")
+        author = request.form.get("author", "").strip() or g.user["name"]
+        store.add_recommendation(patient_id, text[:1000], author[:120])
+        audit("agregar_recomendacion", paciente=patient_id)
     return redirect(url_for("views.doctor_patient", patient_id=patient_id) + "#recomendaciones")
 
 
 @views.route("/medico/paciente/<patient_id>/recomendaciones/<rec_id>", methods=["POST"])
+@role_required("medico")
 def doctor_review_recommendation(patient_id, rec_id):
     _patient_or_404(patient_id)
     status = {"aprobar": "aprobada", "descartar": "descartada"}.get(request.form.get("action"))
     if status is None or store.set_recommendation_status(patient_id, rec_id, status) is None:
         abort(400)
+    audit("revisar_recomendacion", paciente=patient_id, recomendacion=rec_id, estado=status)
     return redirect(url_for("views.doctor_patient", patient_id=patient_id) + "#recomendaciones")
 
 
 # ===== PACIENTE =====
 @views.route("/paciente")
+@role_required("paciente", "medico")
 def patient_home():
+    if g.user["role"] == "paciente":
+        return redirect(url_for("views.patient_summary", patient_id=g.user["patient_id"]))
     return render_template("patient_select.html", patients=store.all())
 
 
 @views.route("/paciente/<patient_id>")
+@role_required("paciente", "medico")
 def patient_summary(patient_id):
+    # El paciente solo puede ver su propio resumen; el médico puede previsualizarlo.
+    if g.user["role"] == "paciente" and g.user["patient_id"] != patient_id:
+        abort(404)
     patient = _patient_or_404(patient_id)
+    audit("ver_resumen", paciente=patient_id)
     reports = patient["reports"]
     latest = reports[-1] if reports else None
     items = []

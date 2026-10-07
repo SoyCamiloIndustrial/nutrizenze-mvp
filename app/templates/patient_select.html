@@ -2,8 +2,8 @@
 {% block title %}Paciente · Vital Trace{% endblock %}
 {% block rol %}<span class="rol">Paciente</span>{% endblock %}
 {% block content %}
-<h1>¿Quién eres?</h1>
-<p class="sub">En la demo eliges un paciente ficticio. Con inicio de sesión, cada paciente verá solo su información.</p>
+<h1>Vista del paciente</h1>
+<p class="sub">Como profesional puedes previsualizar lo que ve cada paciente.</p>
 <div class="card">
   {% for p in patients %}
   <p><a class="btn verde" href="{{ url_for('views.patient_summary', patient_id=p.id) }}">{{ p.name }}</a></p>

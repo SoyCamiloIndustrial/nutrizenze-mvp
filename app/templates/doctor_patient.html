@@ -4,7 +4,7 @@
 {% block content %}
 <p><a href="{{ url_for('views.doctor_home') }}">← Pacientes</a></p>
 <h1>{{ patient.name }}</h1>
-<p class="sub">{{ patient.age }} años · {{ "Masculino" if patient.sex == "M" else "Femenino" }} · {{ patient.reports|length }} exámenes</p>
+<p class="sub">{{ patient.age }} años · {{ "Masculino" if patient.sex == "M" else "Femenino" }} · {{ patient.reports|length }} exámenes · <a href="{{ url_for('views.patient_summary', patient_id=patient.id) }}">Ver lo que ve el paciente</a></p>
 
 <div class="card">
   <h2>Alertas para revisión</h2>
@@ -56,6 +56,7 @@
       <td><span class="chip {{ {'aprobada':'ok','pendiente':'media','descartada':'info'}[r.status] }}">{{ r.status|capitalize }}</span></td>
       <td>{% if r.status == "pendiente" %}
         <form method="post" action="{{ url_for('views.doctor_review_recommendation', patient_id=patient.id, rec_id=r.id) }}" class="fila">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button class="btn verde peq" name="action" value="aprobar">Aprobar</button>
           <button class="btn linea peq" name="action" value="descartar">Descartar</button>
         </form>{% endif %}</td>
@@ -63,6 +64,7 @@
     {% endfor %}
   </table>
   <form method="post" action="{{ url_for('views.doctor_add_recommendation', patient_id=patient.id) }}" style="margin-top:16px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label for="text"><strong>Nueva recomendación para el paciente</strong></label>
     <textarea id="text" name="text" rows="2" required></textarea>
     <div class="fila" style="margin-top:8px">

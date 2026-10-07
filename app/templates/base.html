@@ -40,8 +40,17 @@
 <body>
   <header>
     <a href="{{ url_for('views.portal') }}" class="marca">Vital <span>Trace</span></a>
-    {% block rol %}{% endblock %}
+    <div class="fila">
+      {% block rol %}{% endblock %}
+      {% if g.user %}
+      <span class="rol">{{ g.user.name }}</span>
+      <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn peq linea">Salir</button></form>
+      {% endif %}
+    </div>
   </header>
-  <main>{% block content %}{% endblock %}</main>
+  <main>
+    {% for m in get_flashed_messages() %}<div class="alerta alta" role="alert">{{ m }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>

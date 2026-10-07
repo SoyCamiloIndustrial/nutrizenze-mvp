@@ -105,6 +105,10 @@ Con la API corriendo (`python app/main.py`), abre http://localhost:5000:
 - **Entrar como médico** (`/medico`): lista de pacientes con alertas, historial completo de exámenes, comparación entre tomas y gestión de recomendaciones (aprobar, descartar o agregar).
 - **Entrar como paciente** (`/paciente`): resumen del último examen y solo las recomendaciones aprobadas por el profesional.
 
-La información de la API se movió de `/` a `/api`. La demo usa datos ficticios (`app/data/demo_patients.json`), guarda los cambios solo en memoria y todavía no tiene inicio de sesión.
+La información de la API se movió de `/` a `/api`. La demo usa datos ficticios (`app/data/demo_patients.json`) y guarda los cambios solo en memoria.
 
-Tests: `pytest`
+Ambas entradas requieren iniciar sesión. Los usuarios demo son `medico.demo`, `paciente.uno` y `paciente.dos`, y su contraseña viene de `DEMO_PASSWORD` (ver `.env.example`). En local, si no la defines, se genera una y se muestra en la consola. La API, salvo `/api/health`, solo responde a médicos con sesión.
+
+Despliegue en Railway con subdominio de Namecheap: ver [DEPLOY.md](DEPLOY.md).
+
+Tests: `pip install -r requirements-dev.txt && pytest`

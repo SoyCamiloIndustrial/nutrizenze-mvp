@@ -2,7 +2,6 @@
 # Datos sintéticos (no corresponden a ningún paciente real).
 import pytest
 
-from app.main import app
 from app.models.longitudinal import compare_reports, friedewald_ldl, rcv_percent
 
 PREVIOUS = {
@@ -61,8 +60,8 @@ def test_ldl_inconsistent_and_order_independent():
     assert "LDL_INCONSISTENTE" in codes(result, "ldl")
 
 
-def test_endpoint():
-    client = app.test_client()
+def test_endpoint(doctor):
+    client = doctor
     resp = client.post("/api/compare-labs", json={"previous": PREVIOUS, "current": CURRENT})
     assert resp.status_code == 200
     assert resp.get_json()["status"] == "success"

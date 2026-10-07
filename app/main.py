@@ -2,16 +2,26 @@
 from flask import Flask, jsonify, request
 from datetime import datetime
 import json
+import logging
+import os
 import re
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 try:
     from app.models.longitudinal import compare_reports
+    from app.security import init_security
     from app.views import views
 except ImportError:  # ejecutado como `python app/main.py`
     from models.longitudinal import compare_reports
+    from security import init_security
     from views import views
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 app = Flask(__name__)
+init_security(app)
 app.register_blueprint(views)
 
 # Cargar strings
@@ -134,8 +144,9 @@ def analyze_labs():
             "values": classified,
             "message": "Análisis completado"
         })
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+    except Exception:
+        app.logger.exception("Error procesando la solicitud")
+        return jsonify({"status": "error", "message": "Error interno"}), 500
 
 @app.route('/api/get-recommendations', methods=['POST'])
 def get_recommendations():
@@ -149,8 +160,9 @@ def get_recommendations():
             "recommendations": recommendations,
             "message": "Recomendaciones generadas"
         })
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+    except Exception:
+        app.logger.exception("Error procesando la solicitud")
+        return jsonify({"status": "error", "message": "Error interno"}), 500
 
 @app.route('/api/compare-labs', methods=['POST'])
 def compare_labs():
@@ -171,4 +183,4 @@ if __name__ == '__main__':
     print("="*50)
     print("👉 http://localhost:5000")
     print("="*50 + "\n")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1", host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))

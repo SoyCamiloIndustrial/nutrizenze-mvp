@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión · Vital Trace{% endblock %}
+{% block content %}
+<div class="card" style="max-width:420px;margin:24px auto">
+  <h1>Iniciar sesión</h1>
+  <p class="sub">Ingresa con el usuario que te asignó tu equipo de salud.</p>
+  <form method="post" action="{{ url_for('auth.login') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <label for="username">Usuario</label>
+    <input type="text" id="username" name="username" autocomplete="username" required autofocus>
+    <label for="password" style="display:block;margin-top:12px">Contraseña</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required
+           style="width:100%;padding:10px;border:1px solid var(--borde);border-radius:8px;font:inherit">
+    <button class="btn" style="margin-top:16px;width:100%">Entrar</button>
+  </form>
+</div>
+{% endblock %}
